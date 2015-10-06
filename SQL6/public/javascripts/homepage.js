@@ -1,11 +1,30 @@
 var customerTable;
 var propertiesTable;
+var currentProperties = [];
 $(document).ready(function() {
-	customerTable = $("#customerTable").DataTable();
-});
-
-$(document).ready(function() {
+	//customerTable = $("#customerTable").DataTable();
 	propertiesTable = $("#propertiesTable").DataTable();
+
+	$('#propertiesTable tbody').on( 'click', 'tr', function () {
+		if ( $(this).hasClass('selected') ) {
+			$(this).removeClass('selected');
+		}
+		else {
+			propertiesTable.$('tr.selected').removeClass('selected');
+			$(this).addClass('selected');
+			var innerItems = $(this)[0].childNodes;
+			var selectedHotel = {
+				Brand: innerItems[0].innerText,
+				PropertyID: innerItems[1].innerText,
+				Name: innerItems[2].innerText,
+				City: innerItems[3].innerText,
+				State: innerItems[4].innerText,
+				Postal: innerItems[5].innerText,
+				Country: innerItems[6].innerText
+			};
+			//Maybe Add a function so that the selected Hotel is shown on the map
+		}
+	} );
 });
 
 var map;
@@ -104,11 +123,11 @@ function hotelQuery()
 		url: './hotelsByLocation',
 		contentType: 'application/json',
 		success: function (data) {
-			var properties = [];
+			currentProperties = data;
 			propertiesTable.clear();
 			for (var item in data) {
 				propertiesTable.row.add({
-					0:  data[item].Brand,
+					0: data[item].Brand,
 					1: data[item].PropertyID,
 					2: data[item].Name,
 					3: data[item].City,
