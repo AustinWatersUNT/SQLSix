@@ -20,83 +20,30 @@
 </head>
 <body>
 <!-- Fixed navbar -->
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">SQL 6</a>
+            <button type="button" class="navbar-toggle collapse" data-toggle="collapse" aria-expanded="false">
+                <span class="sr-only">Toggle Naviagation</span>
+                <span clas="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+                <img src="./images/whitelogosm.png" height="100%"/>
+            </a>
         </div>
-        <div id="navOptions" class="navbar-collapse collapse">
-        </div><!--/.nav-collapse -->
+        <div class="collapse navbar-collapse">
+            <ul class="nav nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li ><a href="/hotel">Hotel Informaion</a></li>
+                <li ><a href="#">Results</a></li>
+                <li ><a href="#">About</a></li>
+            </ul>
+        </div>
     </div>
-</div>
+</nav>
 
-<div class="container" id="customers">
+<div class="container">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6 map">
-                <!-- <div id="floating-panel">
-                    <input type="text" name="inputText">
-                </div> -->
-                <div id="map"></div>
-            </div>
-            <div class="col-md-6">
-
-                <form role="form">
-                    <div class="form-group">
-                        <label for="state">Countries</label>
-                        <select type="text" class="form-control" id="country" name="country" onchange="onCountrySelection()">
-                            <option value="">Select a Country</option>
-                            <% for(var i = 0; i < countries.length; i++) { %>
-                            <option value="<%= countries[i].Country %>"><%= countries[i].Country %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label> <img style="display: none" id="stateLoad" src="./images/small_loader.gif" />
-                        <select type="text" class="form-control" id="state" name="state" onchange="onStateSelection()" disabled>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City:</label> <img style="display: none" id="cityLoad" src="./images/small_loader.gif" />
-                        <select type="text" class="form-control" id="city" name="city" onchange="hotelQuery()" disabled>
-                        </select>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <img src="./images/bigdata.png" width="auto" height="100%"/>
     </div>
 </div>
-
-<br/>
-<br/>
-<br/>
-
-<div class="container">
-    <table id="propertiesTable" class="table">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Brand</th>
-            <th>Property ID</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>State</td>
-            <th>Postal</th>
-            <th>Country</th>
-        </tr>
-        </thead>
-        <tbody id="propertiesBody">
-        </tbody>
-    </table>
-</div>
-
-
-<div class="container">
-    <div id="bookcancelpie"></div>
-</div>
-
-
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
