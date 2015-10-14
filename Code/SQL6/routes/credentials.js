@@ -5,5 +5,4 @@ var connectionCredentials = {
     database: 'sql6'
 };
 
-
 module.exports = connectionCredentials;
