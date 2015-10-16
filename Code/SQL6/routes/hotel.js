@@ -191,7 +191,7 @@ router.post('/cancelById', function(req, res) {
 
     connection.query(queryString, function(err, rows, fields) {
       if (err) throw err;
-      s
+      
       //Send the response back to the page
       res.send(rows);
 
