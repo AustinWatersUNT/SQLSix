@@ -201,5 +201,114 @@ router.post('/cancelById', function(req, res) {
   });
 });
 
+router.post('/hotelInformation', function(req, res) {
+  var query = req.body;
+
+  //Create Query String
+  var queryString = "" +
+      "SELECT ( " +
+      "SELECT COUNT(*) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as Bookings, ( " +
+      "SELECT COUNT(*) " +
+      "FROM sql6.cancel " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as Cancellations, ( " +
+      "SELECT COUNT(*) " +
+      "FROM sql6.modify " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as Modifications, ( " +
+      "SELECT AVG(RATE) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " && Rate > 0 " +
+      "GROUP BY PropertyId " +
+      ") as AverageRate, ( " +
+      "SELECT AVG(Rooms) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as AverageRooms, ( " +
+      "SELECT COUNT(*) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " && Rate=0 " +
+      "GROUP BY PropertyId " +
+      ") as FreeRooms, ( " +
+      "SELECT AVG(Adults) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as AverageAdults, ( " +
+      "SELECT AVG(Children) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as AverageChildren, ( " +
+      "SELECT AVG( DATEDIFF(OutDate, InDate)) " +
+      "FROM sql6.booking " +
+      "WHERE PropertyId=" + query.Id + " " +
+      "GROUP BY PropertyId " +
+      ") as AverageStay; ";
+
+  var connection = mysql.createConnection(connectionCredentials);
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+
+    console.log('connected as id ' + connection.threadId);
+
+    connection.query(queryString, function(err, rows, fields) {
+      if (err) throw err;
+
+      //Send the response back to the page
+      res.send(rows);
+
+    });
+
+    connection.end();
+  });
+});
+
+router.post('/topCustomers', function(req, res) {
+    var query = req.body;
+
+    //Create Query String
+    var queryString = "SELECT b.DestinationId, c.Name, Count(b.DestinationId) as Customers, AVG(b.Rate) as Rate " +
+    "FROM sql6.booking as b " +
+    "LEFT JOIN sql6.customers as c " +
+    "on b.DestinationId = c.Id " +
+    "WHERE b.PropertyId=" + query.Id + " and b.rate > 0 " +
+    "GROUP BY DestinationId " +
+    "Order BY Customers Desc;";
+
+    var connection = mysql.createConnection(connectionCredentials);
+
+    connection.connect(function(err) {
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+        }
+
+        console.log('connected as id ' + connection.threadId);
+
+        connection.query(queryString, function(err, rows, fields) {
+            if (err) throw err;
+
+            //Send the response back to the page
+            res.send(rows);
+
+        });
+
+        connection.end();
+    });
+});
+
+
 
 module.exports = router;

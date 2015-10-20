@@ -3,33 +3,18 @@ var propertiesTable;
 var cancelbookedpie;
 var currentProperties = [];
 
-var bookcancelpieOptions = {
-	data: [
-		{
-			type: "pie",
-			showInLegend: true,
-			toolTipContent: "{y} - #percent %",
-			legendText: "{indexLabel}",
-			dataPoints: [
-				{y: 0, indexLabel: "Booked"},
-				{y: 0, indexLabel: "Canceled"}
-			]
-		}
-	]
-};
-
-
+var selectedHotel = {};
+var formSelectedHotel = {};
 
 $(document).ready(function() {
 	//customerTable = $("#customerTable").DataTable();
 	propertiesTable = $("#propertiesTable").DataTable(); //Turns our propertiesTable into a DataTable
 
-	$("#bookcancelpie").CanvasJSChart(bookcancelpieOptions);
-
 	//Code to select an item from the table
 	$('#propertiesTable tbody').on( 'click', 'tr', function () {
 		if ( $(this).hasClass('selected') ) {
 			$(this).removeClass('selected');
+			$("#hotelSelectSubmit").prop("disabled",true);
 		}
 		else {
 			propertiesTable.$('tr.selected').removeClass('selected');
@@ -37,32 +22,27 @@ $(document).ready(function() {
 
 			//When an item is selected this grabs the data from the table
 			var innerItems = $(this)[0].childNodes;
-			var selectedHotel = {
+			formSelectedHotel = {
 				Id: innerItems[0].innerText,
-				Brand: innerItems[1].innerText,
-				PropertyId: innerItems[2].innerText,
-				Name: innerItems[3].innerText,
-				City: innerItems[4].innerText,
-				State: innerItems[5].innerText,
-				Postal: innerItems[6].innerText,
-				Country: innerItems[7].innerText
+				Name: innerItems[1].innerText
 			};
-
-			//Send the selected hotel to the geocode to get address
-			initMapHotel(selectedHotel);
-			bookingCount(selectedHotel.Id);
-			cancelCount(selectedHotel.Id);
+			$("#hotelSelectSubmit").prop("disabled", false);
 		}
-	} );
+	});
+
+	$('#hotelSelect').modal({
+		backdrop: 'static',
+		keyboard: false
+	})
 });
 
 var map;
-var mapLocation = {J: -34.397, M: 150.644};
+var mapLocation = {J: 33.215, M: -97.133};
 
 //Initalize a Map, This function just takes in a City, State
 function initMap(selectedCity) {
 	var map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 8,
+		zoom: 15,
 		center: {lat: mapLocation.J, lng: mapLocation.M}
 	});
 	var geocoder = new google.maps.Geocoder();
@@ -94,8 +74,7 @@ function geocodeAddress(geocoder, resultsMap, selectedCity) {
 //Does the same as above except, accepts a hotel as the address
 function initMapHotel(selectedHotel) {
 	var map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 8,
-		center: {lat: -34.397, lng: 150.644}
+		zoom: 15
 	});
 	var geocoder = new google.maps.Geocoder();
 
@@ -104,7 +83,7 @@ function initMapHotel(selectedHotel) {
 
 function geocodeAddressHotel(geocoder, resultsMap, selectedHotel) {
 	var address = "";
-	if(selectedHotel) address = selectedHotel.Name + ", " + selectedHotel.City + ", " + selectedHotel.State;
+	if(selectedHotel) address = selectedHotel.City + ", " + selectedHotel.State;
 
 	geocoder.geocode({'address': address}, function(results, status) {
 		if (status === google.maps.GeocoderStatus.OK) {
@@ -153,6 +132,8 @@ function onCountrySelection() {
 	//Clears and redraws the empty table
 	propertiesTable.clear().draw();
 
+	$("#hotelSelectSubmit").prop("disabled",true);
+
 	//Makes sure there is a country to search for
 	if(query.Country != '') {
 		//How to contact the server
@@ -193,9 +174,10 @@ function onStateSelection() {
 	$("#city").prop("disabled", true);
 	$("#cityLoad").show();
 
-
 	//Clear and redraws table
 	propertiesTable.clear().draw();
+
+	$("#hotelSelectSubmit").prop("disabled",true);
 
 	//Makes sure there is a state to chose from
 	if(query.State != '') {
@@ -226,8 +208,7 @@ function hotelQuery()
 		City: document.getElementsByName("city")[0].value
 	};
 
-	//Places a pointier at the location of the query
-	initMap(query);
+	$("#hotelSelectSubmit").prop("disabled",true);
 
 	//Contacts the server to get all the hotels in that city
 	$.ajax({
@@ -246,13 +227,7 @@ function hotelQuery()
 			for (var item in data) {
 				propertiesTable.row.add({
 					0: data[item].Id,
-					1: data[item].Brand,
-					2: data[item].PropertyId,
-					3: data[item].Name,
-					4: data[item].City,
-					5: data[item].State,
-					6: data[item].Postal,
-					7: data[item].Country
+					1: data[item].Name,
 				});
 			}
 			//prints table
@@ -261,48 +236,215 @@ function hotelQuery()
 	});
 }
 
-function bookingCount(Id)
+function hotelInformation(Id)
 {
-	//Creates a query object to send to the server
 	var query = {
 		Id: Id
 	};
-
-	//Contacts the server to get all the hotels in that city
 	$.ajax({
 		type: 'POST',
 		data: JSON.stringify(query), //Must stringify all JSON objects before sending
-		url: './hotel/bookingById', //Same URL is associated on the server
+		url: './hotel/hotelInformation', //Same URL is associated on the server
 		contentType: 'application/json',
 		success: function (data) {
-			var chart = $("#bookcancelpie").CanvasJSChart();
-			chart.options.data[0].dataPoints[0].y = data[0].Booked;
-			chart.render();
+
+			for(var prop in data[0]) {
+				if(data[0][prop] == null) data[0][prop] = 0;
+				selectedHotel[prop] = data[0][prop].toFixed(2);
+				document.getElementById(prop).innerText = selectedHotel[prop];
+			}
+
+			var total = data[0].Bookings + data[0].Modifications + data[0].Cancellations;
+
+			var cancelPercent = data[0].Cancellations == 0 ? 0 : Math.round((data[0].Cancellations/total) * 100);
+			var modifyPercent= data[0].Modifications == 0 ? 0 : Math.round((data[0].Modifications/total) * 100);
+			var bookingPercent = data[0].Bookings == 0 ? 0 : Math.round((data[0].Bookings/total) * 100);
+
+			bvcData = google.visualization.arrayToDataTable([
+				['', 'Total', { role: 'style' }],
+				['Bookings', data[0].Bookings, '#007034'],
+				['Modifications', data[0].Modifications, "#1078A3"],
+				['Cancellations', data[0].Cancellations, '#BC1200']
+			]);
+
+			var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+			chart.clearChart();
+			chart.draw(bvcData, bvcOptions);
+
+			bookingGauge.update(bookingPercent);
+			cancelGauge.update(cancelPercent);
+			modifyGauge.update(modifyPercent);
 		}
 	});
 }
 
-function cancelCount(Id)
-{
-	//Creates a query object to send to the server
+function topCustomers(Id) {
 	var query = {
 		Id: Id
 	};
-
-	//Contacts the server to get all the hotels in that city
 	$.ajax({
 		type: 'POST',
 		data: JSON.stringify(query), //Must stringify all JSON objects before sending
-		url: './hotel/cancelById', //Same URL is associated on the server
+		url: './hotel/topCustomers', //Same URL is associated on the server
 		contentType: 'application/json',
 		success: function (data) {
-			var chart = $("#bookcancelpie").CanvasJSChart();
-			chart.options.data[0].dataPoints[1].y = data[0].Cancelled;
-			chart.render();
 
+			var tempData = [
+				['Customer', 'Total']
+			];
+			if(data.length > 0) {
+				document.getElementById("TopBooker").innerText = data[0].Name;
+				for (var item in data) {
+					tempData.push([data[item].Name, data[item].Customers]);
+				}
+			}
+			else {
+				document.getElementById("TopBooker").innerText = "";
+				document.getElementById("LowestRateBooker").innerText = "";
+				document.getElementById("LowestRate").innerText = "";
+				tempData.push(['', 0]);
+			}
+
+			customerData = google.visualization.arrayToDataTable(tempData);
+
+			var chart = new google.visualization.BarChart(document.getElementById('chart_customers'));
+			chart.clearChart();
+			chart.draw(customerData, customerOptions);
+
+			var insertRateData = [
+				['Customer', 'Rate']
+			];
+
+			if(data.length > 0) {
+				var lowestRate = 0;
+				var lowestRateBooker = '';
+				for (var item in data) {
+					if(data[item].Rate < lowestRate || lowestRate == 0) {
+						lowestRate = data[item].Rate;
+						lowestRateBooker = data[item].Name;
+					}
+					insertRateData.push([data[item].Name, parseFloat(data[item].Rate.toFixed(2))]);
+				}
+				document.getElementById("LowestRateBooker").innerText = lowestRateBooker;
+				document.getElementById("LowestRate").innerText = lowestRate.toFixed(2);
+			}
+			else {
+				insertRateData.push(['', 0]);
+			}
+
+			rateData = google.visualization.arrayToDataTable(insertRateData);
+			var rateChart = new google.visualization.BarChart(document.getElementById('chart_customer_rates'));
+			rateChart.clearChart();
+			rateChart.draw(rateData, rateOptions);
 		}
 	});
 }
 
 
+function selectHotel() {
+	selectedHotel = formSelectedHotel;
+	selectedHotel.City = document.getElementsByName("city")[0].value;
+	selectedHotel.State = document.getElementsByName("state")[0].value;
+	document.getElementById("hotelTitle").innerText = selectedHotel.Name;
+	initMapHotel(selectedHotel);
+	hotelInformation(selectedHotel.Id);
+	topCustomers(selectedHotel.Id);
+	resetForm();
+}
 
+function resetForm() {
+	$('#hotelForm')[0].reset();
+	$("#city").prop("disabled", true);
+	$("#state").prop("disabled", true);
+	document.getElementById("city").innerHTML =  "<option value=''>Select a City</option>";
+	document.getElementById("state").innerHTML =  "<option value=''>Select a State</option>";
+	propertiesTable.clear();
+	propertiesTable.draw();
+	formSelectedHotel = {};
+}
+
+google.load('visualization', '1', {packages: ['corechart', 'bar']});
+google.setOnLoadCallback(drawBasic);
+
+
+var bvcData;
+var customerData;
+var rateData
+
+var bvcOptions = {
+	title: 'Hotel Activity',
+	titleTextStyle: {
+		fontSize: '20'
+	},
+	colors: ['#4f4b4b'],
+	chartArea: {
+		top: '50',
+		width: '50%',
+		height: '50%'
+	},
+	hAxis: {
+		title: 'Total'
+	}
+};
+
+var customerOptions = {
+	title: 'Top Booker',
+	titleTextStyle: {
+		fontSize: '20'
+	},
+	colors: ['#1078A3'],
+	chartArea: {
+		top: '50',
+		width: '50%',
+		height: '50%'
+	},
+	hAxis: {
+		title: 'Total'
+	}
+};
+
+var rateOptions = {
+	title: 'Booker Rates',
+	titleTextStyle: {
+		fontSize: '20'
+	},
+	colors: ['#1078A3'],
+	chartArea: {
+		top: '50',
+		width: '50%',
+		height: '50%'
+	},
+	hAxis: {
+		title: 'Rates'
+	}
+};
+
+
+function drawBasic() {
+
+	bvcData = google.visualization.arrayToDataTable([
+		['', 'Total', { role: 'style' }],
+		['Bookings', 0, '#007034'],
+		['Modifications', 0, '#1078A3'],
+		['Cancellations', 0, '#BC1200']
+	]);
+
+	customerData = google.visualization.arrayToDataTable([
+		['Customer', 'Total'],
+		['', 0]
+	]);
+
+	rateData = google.visualization.arrayToDataTable([
+		['Customer', 'Rate'],
+		['', 0]
+	]);
+
+	var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+	chart.draw(bvcData, bvcOptions);
+
+	var customerChart = new google.visualization.BarChart(document.getElementById('chart_customers'));
+	customerChart.draw(customerData, customerOptions);
+
+	var ratesChart = new google.visualization.BarChart(document.getElementById('chart_customer_rates'));
+	ratesChart.draw(rateData, rateOptions);
+}

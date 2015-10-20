@@ -6,17 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SQL 6</title>
     <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhSn6EQ-PkMB--yhkDOrRKnPckMhE5OP8&callback=initMap" async defer></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="http://d3js.org/d3.v3.min.js" language="JavaScript"></script>
+    <script src="./javascripts/LiquidGauge.js" type="text/javascript"></script>
     <link href="./stylesheets/bootstrap.min.css" rel="stylesheet">
     <link href="./stylesheets/hotel.css" rel="stylesheet">
+    <link href="./stylesheets/navbar.css" rel="stylesheet">
     <link rel="stylesheet" href="./stylesheets/bootstrap-multiselect.css" type="text/css"/>
     <script src="./javascripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="./javascripts/hotel.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhSn6EQ-PkMB--yhkDOrRKnPckMhE5OP8&callback=initMap" async defer></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/dt-1.10.9/datatables.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
-    <script type="text/javascript" src="./canvasjs/jquery.canvasjs.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/r/dt/dt-1.10.9/datatables.min.js"></script>
-
+    <style>
+        .liquidFillGaugeText { font-family: Helvetica; font-weight: bold; }
+    </style>
 </head>
 <body>
 <!-- Fixed navbar -->
@@ -27,7 +32,7 @@
                 <span class="sr-only">Toggle Naviagation</span>
                 <span clas="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="./images/whitelogosm.png" height="100%"/>
             </a>
         </div>
@@ -37,20 +42,136 @@
                 <li class="active"><a href="/hotel">Hotel Information</a></li>
                 <li><a href="#">Results</a></li>
                 <li><a href="#">About</a></li>
+                <li><a href="/quiz">Quiz</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container" id="customers">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6 map">
-                <div id="map"></div>
-            </div>
-            <div class="col-md-6">
+<div class="container">
+    <div class="row">
+        <span>
+            <button style="display:inline; margin-right: 20px" type="button" class="btn btn-primary" data-toggle="modal" data-target="#hotelSelect">Select</button>
+            <h2 style="display:inline; vertical-align: middle"><label id="hotelTitle">Select Hotel</label></h2>
+        </span>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="map"></div>
+        </div>
+        <div class="col-md-6">
+            <table id="resultsTable" class="table">
+                <thead>
+                <tr>
+                    <th>Result</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="resultsBody">
+                <tr>
+                    <th>Bookings</th>
+                    <th id="Bookings">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Modifications</th>
+                    <th id="Modifications">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Cancellations</th>
+                    <th id="Cancellations">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Average Rooms Per Booking</th>
+                    <th id="AverageRooms">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Free Rooms Booked</th>
+                    <th id="FreeRooms">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Average Rate Per Booking</th>
+                    <th id="AverageRate">0.00</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Average Adults Per Booking</th>
+                    <th id="AverageAdults">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Average Children Per Booking</th>
+                    <th id="AverageChildren">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Average Stay Per Booking</th>
+                    <th id="AverageStay">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Top Booker</th>
+                    <th id="TopBooker">0</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Lowest Rate</th>
+                    <th id="LowestRateBooker"></th>
+                    <th id="LowestRate">0.00</th>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <svg id="bookingGauge" width="100%" height="250"></svg>
+            <br>
+            <h3 style="color: #007034; text-align: center;"><label>Bookings</label></h3>
+        </div>
+        <div class="col-md-4">
+            <svg id="modifyGauge" width="100%" height="250"></svg>
+            <br>
+            <h3 style="color: #1078A3; text-align: center;"><label>Modifications</label></h3>
+        </div>
+        <div class="col-md-4">
+            <svg id="cancelGauge" width="100%" height="250"></svg>
+            <br>
+            <h3 style="color: #BC1200; text-align: center;"><label>Cancellations</label></h3>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div id="chart_div"></div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="chart_customer_rates"></div>
+        </div>
+        <div class="col-md-6">
+            <div id="chart_customers"></div>
+        </div>
+    </div>
+</div>
 
-                <form role="form">
+<!-- Modal -->
+<div class="modal fade" id="hotelSelect" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="resetForm()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Hotel Select</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form" id="hotelForm">
                     <div class="form-group">
                         <label for="state">Countries</label>
                         <select type="text" class="form-control" id="country" name="country" onchange="onCountrySelection()">
@@ -71,38 +192,64 @@
                         </select>
                     </div>
                 </form>
+                <table id="propertiesTable" class="table">
+                    <thead>
+                    <tr>
+                        <th style="width: 50px">Id</th>
+                        <th>Name</th>
+                    </tr>
+                    </thead>
+                    <tbody id="propertiesBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetForm()">Close</button>
+                <button id="hotelSelectSubmit" type="button" class="btn btn-primary" data-dismiss="modal"  onclick="selectHotel()" disabled>Select</button>
             </div>
         </div>
     </div>
 </div>
 
-<br/>
-<br/>
-<br/>
+<script language="JavaScript">
+    var bookingConfig = liquidFillGaugeDefaultSettings();
+    bookingConfig.circleColor = "#007034";
+    bookingConfig.textColor = "#007034";
+    bookingConfig.waveTextColor = "#007034";
+    bookingConfig.waveColor = "#80B89A";
+    bookingConfig.circleThickness = 0.2;
+    bookingConfig.textVertPosition = 0.5;
+    bookingConfig.waveAnimateTime = 1000;
+    var bookingGauge = loadLiquidFillGauge("bookingGauge", 0, bookingConfig);
 
-<div class="container">
-    <table id="propertiesTable" class="table">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Brand</th>
-            <th>Property ID</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>State</td>
-            <th>Postal</th>
-            <th>Country</th>
-        </tr>
-        </thead>
-        <tbody id="propertiesBody">
-        </tbody>
-    </table>
-</div>
+    var cancelConfig = liquidFillGaugeDefaultSettings();
+    cancelConfig.circleColor = "#BC1200";
+    cancelConfig.textColor = "#BC1200";
+    cancelConfig.waveTextColor = "#BC1200";
+    cancelConfig.waveColor = "#DE8880";
+    cancelConfig.circleThickness = 0.2;
+    cancelConfig.textVertPosition = 0.5;
+    cancelConfig.waveAnimateTime = 1000;
+    var cancelGauge = loadLiquidFillGauge("cancelGauge", 0, cancelConfig);
 
+    var modifyConfig = liquidFillGaugeDefaultSettings();
+    modifyConfig.circleColor = "#1078A3";
+    modifyConfig.textColor = "#1078A3";
+    modifyConfig.waveTextColor = "#1078A3";
+    modifyConfig.waveColor = "#88BCD1";
+    modifyConfig.circleThickness = 0.2;
+    modifyConfig.textVertPosition = 0.5;
+    modifyConfig.waveAnimateTime = 1000;
+    var modifyGauge = loadLiquidFillGauge("modifyGauge", 0, modifyConfig);
 
-<div class="container">
-    <div id="bookcancelpie"></div>
-</div>
+    function NewValue(){
+        if(Math.random() > .5){
+            return Math.round(Math.random()*100);
+        } else {
+            return (Math.random()*100).toFixed(1);
+        }
+    }
+</script>
 
 </body>
 </html>
