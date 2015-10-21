@@ -283,7 +283,7 @@ router.post('/topCustomers', function(req, res) {
     "FROM sql6.booking as b " +
     "LEFT JOIN sql6.customers as c " +
     "on b.DestinationId = c.Id " +
-    "WHERE b.PropertyId=" + query.Id + " and b.rate > 0 " +
+    "WHERE b.PropertyId=" + query.Id + " && b.rate > 0 " +
     "GROUP BY DestinationId " +
     "Order BY Customers Desc;";
 

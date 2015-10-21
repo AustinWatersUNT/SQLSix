@@ -366,10 +366,9 @@ function resetForm() {
 google.load('visualization', '1', {packages: ['corechart', 'bar']});
 google.setOnLoadCallback(drawBasic);
 
-
 var bvcData;
 var customerData;
-var rateData
+var rateData;
 
 var bvcOptions = {
 	title: 'Hotel Activity',
@@ -379,8 +378,11 @@ var bvcOptions = {
 	colors: ['#4f4b4b'],
 	chartArea: {
 		top: '50',
-		width: '50%',
+		width: '80%',
 		height: '50%'
+	},
+	legend: {
+		position: 'none'
 	},
 	hAxis: {
 		title: 'Total'
@@ -395,8 +397,12 @@ var customerOptions = {
 	colors: ['#1078A3'],
 	chartArea: {
 		top: '50',
-		width: '50%',
+		left: 150,
+		width: '70%',
 		height: '50%'
+	},
+	legend: {
+		position: 'none'
 	},
 	hAxis: {
 		title: 'Total'
@@ -411,8 +417,12 @@ var rateOptions = {
 	colors: ['#1078A3'],
 	chartArea: {
 		top: '50',
-		width: '50%',
+		left: 150,
+		width: '70%',
 		height: '50%'
+	},
+	legend: {
+		position: 'none'
 	},
 	hAxis: {
 		title: 'Rates'

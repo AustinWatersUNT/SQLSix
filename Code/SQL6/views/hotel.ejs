@@ -40,7 +40,7 @@
             <ul class="nav nav navbar-nav">
                 <li><a href="/">Home</a></li>
                 <li class="active"><a href="/hotel">Hotel Information</a></li>
-                <li><a href="#">Results</a></li>
+                <li ><a href="/overview">Overview</a></li>
                 <li><a href="#">About</a></li>
                 <li><a href="/quiz">Quiz</a></li>
             </ul>
@@ -54,80 +54,6 @@
             <button style="display:inline; margin-right: 20px" type="button" class="btn btn-primary" data-toggle="modal" data-target="#hotelSelect">Select</button>
             <h2 style="display:inline; vertical-align: middle"><label id="hotelTitle">Select Hotel</label></h2>
         </span>
-    </div>
-    <br/>
-    <div class="row">
-        <div class="col-md-6">
-            <div id="map"></div>
-        </div>
-        <div class="col-md-6">
-            <table id="resultsTable" class="table">
-                <thead>
-                <tr>
-                    <th>Result</th>
-                    <th>Value</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody id="resultsBody">
-                <tr>
-                    <th>Bookings</th>
-                    <th id="Bookings">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Modifications</th>
-                    <th id="Modifications">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Cancellations</th>
-                    <th id="Cancellations">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Average Rooms Per Booking</th>
-                    <th id="AverageRooms">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Free Rooms Booked</th>
-                    <th id="FreeRooms">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Average Rate Per Booking</th>
-                    <th id="AverageRate">0.00</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Average Adults Per Booking</th>
-                    <th id="AverageAdults">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Average Children Per Booking</th>
-                    <th id="AverageChildren">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Average Stay Per Booking</th>
-                    <th id="AverageStay">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Top Booker</th>
-                    <th id="TopBooker">0</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Lowest Rate</th>
-                    <th id="LowestRateBooker"></th>
-                    <th id="LowestRate">0.00</th>
-                </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
     <br />
     <div class="row">
@@ -151,15 +77,81 @@
     <div class="row">
         <div id="chart_div"></div>
     </div>
+    <br/>
+    <div class="row">
+        <div id="map"></div>
+    </div>
     <br>
     <div class="row">
         <div class="col-md-6">
-            <div id="chart_customer_rates"></div>
+            <table id="resultsTable" class="table" style="font-size: 15px;">
+                <thead>
+                <tr>
+                    <th>Result</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody id="resultsBody">
+                <tr>
+                    <th>Bookings</th>
+                    <th id="Bookings">0</th>
+                </tr>
+                <tr>
+                    <th>Modifications</th>
+                    <th id="Modifications">0</th>
+                </tr>
+                <tr>
+                    <th>Cancellations</th>
+                    <th id="Cancellations">0</th>
+                </tr>
+                <tr>
+                    <th>Average Rooms Per Booking</th>
+                    <th id="AverageRooms">0</th>
+                </tr>
+                <tr>
+                    <th>Free Rooms Booked</th>
+                    <th id="FreeRooms">0</th>
+                </tr>
+                <tr>
+                    <th>Average Rate Per Booking</th>
+                    <th id="AverageRate">0.00</th>
+                </tr>
+                <tr>
+                    <th>Average Adults Per Booking</th>
+                    <th id="AverageAdults">0</th>
+                </tr>
+                <tr>
+                    <th>Average Children Per Booking</th>
+                    <th id="AverageChildren">0</th>
+                </tr>
+                <tr>
+                    <th>Average Stay Per Booking</th>
+                    <th id="AverageStay">0</th>
+                </tr>
+                <tr>
+                    <th>Top Booker</th>
+                    <th id="TopBooker">0</th>
+                </tr>
+                <tr>
+                    <th>Lowest Rate Booker</th>
+                    <th id="LowestRateBooker"></th>
+                </tr>
+                <tr>
+                    <th>Lowest Rate</th>
+                    <th id="LowestRate">0.00</th>
+                </tr>
+                </tbody>
+            </table>
         </div>
         <div class="col-md-6">
+            <br>
+            <div id="chart_customer_rates"></div>
+            <br>
+            <br>
             <div id="chart_customers"></div>
         </div>
     </div>
+    <br>
 </div>
 
 <!-- Modal -->
@@ -192,7 +184,7 @@
                         </select>
                     </div>
                 </form>
-                <table id="propertiesTable" class="table">
+                <table id="propertiesTable" class="table" style="cursor:pointer;">
                     <thead>
                     <tr>
                         <th style="width: 50px">Id</th>
@@ -219,7 +211,7 @@
     bookingConfig.waveColor = "#80B89A";
     bookingConfig.circleThickness = 0.2;
     bookingConfig.textVertPosition = 0.5;
-    bookingConfig.waveAnimateTime = 1000;
+    bookingConfig.waveAnimateTime = 750;
     var bookingGauge = loadLiquidFillGauge("bookingGauge", 0, bookingConfig);
 
     var cancelConfig = liquidFillGaugeDefaultSettings();
@@ -229,7 +221,7 @@
     cancelConfig.waveColor = "#DE8880";
     cancelConfig.circleThickness = 0.2;
     cancelConfig.textVertPosition = 0.5;
-    cancelConfig.waveAnimateTime = 1000;
+    cancelConfig.waveAnimateTime = 750;
     var cancelGauge = loadLiquidFillGauge("cancelGauge", 0, cancelConfig);
 
     var modifyConfig = liquidFillGaugeDefaultSettings();
@@ -239,7 +231,7 @@
     modifyConfig.waveColor = "#88BCD1";
     modifyConfig.circleThickness = 0.2;
     modifyConfig.textVertPosition = 0.5;
-    modifyConfig.waveAnimateTime = 1000;
+    modifyConfig.waveAnimateTime = 750;
     var modifyGauge = loadLiquidFillGauge("modifyGauge", 0, modifyConfig);
 
     function NewValue(){
