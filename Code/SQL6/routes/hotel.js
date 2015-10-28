@@ -309,6 +309,34 @@ router.post('/topCustomers', function(req, res) {
     });
 });
 
+router.post('/getLatLng', function(req, res) {
+    var query = req.body;
 
+    //Create Query String
+    var queryString = "SELECT Latitude, Longitude " +
+        "FROM sql6.properties " +
+        "WHERE Id="  + query.Id + ";";
+
+    var connection = mysql.createConnection(connectionCredentials);
+
+    connection.connect(function(err) {
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+        }
+
+        console.log('connected as id ' + connection.threadId);
+
+        connection.query(queryString, function(err, rows, fields) {
+            if (err) throw err;
+
+            //Send the response back to the page
+            res.send(rows);
+
+        });
+
+        connection.end();
+    });
+});
 
 module.exports = router;

@@ -17,17 +17,7 @@ router.post('/quizQuery', function(req, res) {
       "ON b.PropertyId = p.Id " +
       "WHERE p.State = '" + query.State + "' && b.Adults = '" + query.Adults + "' && b.Children = '" + query.Children + "' && ";
 
-      //if state crete rate
-      if(query.RateOption == 1) {
-        queryString += "b.Rate <= 75 ";
-      }
-      else if (query.RateOption == 2) {
-        queryString += "b.Rate > 75 && b.Rate < 100 ";
-
-      }
-      else if (query.RateOption == 3) {
-        queryString += "b.Rate >= 100 ";
-      }
+    queryString += "b.Rate >= " + query.LowRate + " && b.Rate <= " + query.HighRate + " ";
 
       queryString += "GROUP BY PropertyId " +
       "ORDER BY Count(PropertyId) desc " +

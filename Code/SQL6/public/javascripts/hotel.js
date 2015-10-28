@@ -82,18 +82,42 @@ function initMapHotel(selectedHotel) {
 }
 
 function geocodeAddressHotel(geocoder, resultsMap, selectedHotel) {
-	var address = "";
-	if(selectedHotel) address = selectedHotel.City + ", " + selectedHotel.State;
 
-	geocoder.geocode({'address': address}, function(results, status) {
-		if (status === google.maps.GeocoderStatus.OK) {
-			resultsMap.setCenter(results[0].geometry.location);
-			var marker = new google.maps.Marker({
-				map: resultsMap,
-				position: results[0].geometry.location
-			});
-		} else {
-			alert('Geocode was not successful for the following reason: ' + status);
+	var query = {
+		Id: selectedHotel.Id
+	};
+
+	$.ajax({
+		type: 'POST',
+		data: JSON.stringify(query), //All json sent to the server must be stringified
+		url: './hotel/getLatLng',
+		contentType: 'application/json',
+		success: function (data) {
+
+			var address = "";
+
+			if(data[0].Latitude == 0) {
+				address = selectedHotel.City + ", " + selectedHotel.State;
+
+				geocoder.geocode({'address': address}, function(results, status) {
+					if (status === google.maps.GeocoderStatus.OK) {
+						resultsMap.setCenter(results[0].geometry.location);
+						var marker = new google.maps.Marker({
+							map: resultsMap,
+							position: results[0].geometry.location
+						});
+					} else {
+						alert('Geocode was not successful for the following reason: ' + status);
+					}
+				});
+			}
+			else {
+				resultsMap.setCenter({lat: data[0].Latitude, lng: data[0].Longitude});
+				var marker = new google.maps.Marker({
+					map: resultsMap,
+					position: {lat: data[0].Latitude, lng: data[0].Longitude}
+				});
+			}
 		}
 	});
 }
