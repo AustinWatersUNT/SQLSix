@@ -240,24 +240,6 @@ $(document).ready(function () {
 
     function displayFinalSlide(){
 
-        $(stage).append('<table id="propertiesTable" class="table" style="cursor:pointer;">' +
-            '<thead>' +
-            '<tr>' +
-            '<th width="400px">Name</th>' +
-            '<th>City</th>' +
-            '<th>State</th>' +
-            '<th>Average Rate</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody style="text-align: left">' +
-            '</tbody>' +
-            '</table>');
-
-        var propertiesTable = $("#propertiesTable").DataTable({
-            "filter": false,
-            "paging": false
-        }); //Turns our propertiesTable into a DataTable
-
         var query = {
             State: selected,
             Adults: adult,
@@ -265,6 +247,8 @@ $(document).ready(function () {
             LowRate: lowRate,
             HighRate: highRate
         };
+        $(stage).append('<img style="display: none" id="quizloader" src="./images/small_loader.gif" />');
+        $("#quizloader").show();
 
         $.ajax({
             type: 'POST',
@@ -272,6 +256,24 @@ $(document).ready(function () {
             url: './quiz/quizQuery', //Same URL is associated on the server
             contentType: 'application/json',
             success: function (data) {
+                $("#quizloader").hide();
+                $(stage).append('<table id="propertiesTable" class="table" style="cursor:pointer;">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th width="400px">Name</th>' +
+                    '<th>City</th>' +
+                    '<th>State</th>' +
+                    '<th>Average Rate</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody style="text-align: left">' +
+                    '</tbody>' +
+                    '</table>');
+
+                var propertiesTable = $("#propertiesTable").DataTable({
+                    "filter": false,
+                    "paging": false
+                }); //Turns our propertiesTable into a DataTable
 
                 $(stage).append('<a href="/quiz" class="btn btn-primary" style="float: right">Again?</a>');
 
