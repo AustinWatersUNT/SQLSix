@@ -15,11 +15,11 @@ $(document).ready(function() {
 		if ( $(this).hasClass('selected') ) {
 			$(this).removeClass('selected');
 			$("#hotelSelectSubmit").prop("disabled",true);
+			$(this).css("background-color", "white");
 		}
 		else {
 			propertiesTable.$('tr.selected').removeClass('selected');
 			$(this).addClass('selected');
-
 			//When an item is selected this grabs the data from the table
 			var innerItems = $(this)[0].childNodes;
 			formSelectedHotel = {
@@ -29,6 +29,15 @@ $(document).ready(function() {
 			$("#hotelSelectSubmit").prop("disabled", false);
 		}
 	});
+
+	$('#propertiesTable tbody').on( 'mouseover', 'tr', function () {
+		if(!$(this).hasClass('selected')) $(this).addClass('hover_table');
+	});
+
+	$('#propertiesTable tbody').on( 'mouseout', 'tr', function () {
+		if(!$(this).hasClass('selected')) $(this).removeClass('hover_table');
+	});
+
 
 	$('#hotelSelect').modal({
 		backdrop: 'static',
@@ -170,7 +179,7 @@ function onCountrySelection() {
 				$("#state").prop("disabled", false);
 				$("#stateLoad").hide();
 				//Uses the return to make options
-				data.sort(compareStates);
+			 	data.sort(compareStates);
 				var options = "<option value=''>Select a State</option>";
 
 				//Creates all the different state options
@@ -251,7 +260,7 @@ function hotelQuery()
 			for (var item in data) {
 				propertiesTable.row.add({
 					0: data[item].Id,
-					1: data[item].Name,
+					1: data[item].Name
 				});
 			}
 			//prints table

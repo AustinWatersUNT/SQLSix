@@ -12,8 +12,8 @@ router.post('/quizQuery', function(req, res) {
   var query = req.body;
 
   //Create Query String
-  var queryString = "SELECT p.name, p.city, p.state FROM booking as b " +
-      "LEFT JOIN (SELECT Id, Name, City, State FROM properties) as p " +
+  var queryString = "SELECT p.name, p.city, p.state, AVG(b.rate) as avgrate FROM booking as b " +
+      "RIGHT JOIN (SELECT Id, Name, City, State FROM properties) as p " +
       "ON b.PropertyId = p.Id " +
       "WHERE p.State = '" + query.State + "' && b.Adults = '" + query.Adults + "' && b.Children = '" + query.Children + "' && ";
 

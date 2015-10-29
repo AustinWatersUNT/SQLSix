@@ -243,12 +243,13 @@ $(document).ready(function () {
         $(stage).append('<table id="propertiesTable" class="table" style="cursor:pointer;">' +
             '<thead>' +
             '<tr>' +
-            '<th>Name</th>' +
+            '<th width="400px">Name</th>' +
             '<th>City</th>' +
             '<th>State</th>' +
+            '<th>Average Rate</th>' +
             '</tr>' +
             '</thead>' +
-            '<tbody>' +
+            '<tbody style="text-align: left">' +
             '</tbody>' +
             '</table>');
 
@@ -274,16 +275,16 @@ $(document).ready(function () {
 
                 $(stage).append('<a href="/quiz" class="btn btn-primary" style="float: right">Again?</a>');
 
-
                 //removes all table values
                 propertiesTable.clear();
 
                 //Adds all the rows to the table
                 for (var item in data) {
                     propertiesTable.row.add({
-                        0: data[item].Name,
-                        1: data[item].City,
-                        2: data[item].State
+                        0: data[item].name,
+                        1: data[item].city,
+                        2: data[item].state,
+                        3: '$' + data[item].avgrate.toFixed(2)
                     });
                 }
                 //prints table

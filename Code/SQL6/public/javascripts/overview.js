@@ -45,7 +45,6 @@ google.setOnLoadCallback(topHotels());
 
 function topHotels() {
     topHotelsByBooking();
-    topHotelsByCancellations();
 }
 
 function topHotelsByBooking() {
@@ -54,7 +53,8 @@ function topHotelsByBooking() {
         url: './overview/topHotelsByBooking', //Same URL is associated on the server
         contentType: 'application/json',
         success: function (data) {
-            console.log(data);
+
+            topHotelsByCancellations();
 
             var bookingData;
 
