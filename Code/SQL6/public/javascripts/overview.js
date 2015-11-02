@@ -189,7 +189,7 @@ function byInDate() {
             var materialChart = new google.charts.Line(chartDiv);
             materialChart.draw(data, materialOptions);
 
-            byOutDate();
+            document.setTimeout(byOutDate(), 1000);
         }
     });
 }

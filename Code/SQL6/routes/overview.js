@@ -10,7 +10,17 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/statesData', function(req, res) {
-  var content = fs.readFileSync("./json/stateData.json"); //Created JSON to have results load faster
+
+    var queryString = "SELECT b.State, b.Booking, c.Cancellations FROM " +
+    "(Select p.State, COUNT(b.Id) as Booking FROM sql6.booking as b " +
+    "LEFT JOIN sql6.properties as p on p.Id = b.PropertyId " +
+    "GROUP BY p.State) as b " +
+    "LEFT JOIN " +
+    "(Select p.State, COUNT(c.Id) as Cancellations FROM sql6.cancel as c " +
+    "LEFT JOIN sql6.properties as p on p.Id = c.PropertyId " +
+    "GROUP BY p.State) as c on b.State = c.State";
+
+    var content = fs.readFileSync("./json/stateData.json"); //Created JSON to have results load faster
   res.send(JSON.parse(content));
 });
 
