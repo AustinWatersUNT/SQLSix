@@ -40,10 +40,11 @@ function grabMapData() {
     });
 }
 
-google.load('visualization', '1', {packages: ['corechart', 'bar']});
+google.load('visualization', '1', {packages: ['corechart', 'bar', 'line']});
 google.setOnLoadCallback(topHotels());
 
 function topHotels() {
+    customersByBooking();
     topHotelsByBooking();
 }
 
@@ -55,6 +56,7 @@ function topHotelsByBooking() {
         success: function (data) {
 
             topHotelsByCancellations();
+            byInDate();
 
             var bookingData;
 
@@ -100,7 +102,6 @@ function topHotelsByCancellations() {
         url: './overview/topHotelsByCancellation', //Same URL is associated on the server
         contentType: 'application/json',
         success: function (data) {
-            console.log(data);
 
             var cancelData;
 
@@ -135,6 +136,229 @@ function topHotelsByCancellations() {
 
             var chart = new google.visualization.BarChart(document.getElementById('chart_cancel'));
             chart.draw(cancelData, cancelOptions);
+        }
+    });
+}
+
+function byInDate() {
+    $.ajax({
+        type: 'POST',
+        url: './overview/byInDate', //Same URL is associated on the server
+        contentType: 'application/json',
+        success: function (returnData) {
+
+            var chartDiv = document.getElementById('byInDate');
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('date', 'Day');
+            data.addColumn('number', "Booking");
+            data.addColumn('number', "Cancel");
+            data.addColumn('number', "Search");
+
+            var rows = [];
+
+            for (var item in returnData) {
+                for (var prop in returnData[item]) {
+                    if (returnData[item][prop] == null) returnData[item][prop] = 0;
+                }
+                rows.push([
+                    new Date(returnData[item].InDate),
+                    returnData[item].book_count,
+                    returnData[item].cancel_count,
+                    returnData[item].search_count
+                ]);
+            }
+
+            data.addRows(rows);
+
+            var materialOptions = {
+                chart: {
+                    title: 'Bookings, Cancellations and Searches by In Date'
+                },
+                width: '100%',
+                height: 600,
+                axes: {
+                    // Adds labels to each axis; they don't have to match the axis names.
+                    y: {
+                        Amount: {label: 'Amount'}
+                    }
+                },
+                colors: ['#007034', '#BC1200', '#1078A3']
+            };
+
+            var materialChart = new google.charts.Line(chartDiv);
+            materialChart.draw(data, materialOptions);
+
+            byOutDate();
+        }
+    });
+}
+
+function byOutDate() {
+    $.ajax({
+        type: 'POST',
+        url: './overview/byOutDate', //Same URL is associated on the server
+        contentType: 'application/json',
+        success: function (returnData) {
+
+            var outChart = document.getElementById('byOutDate');
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('date', 'Day');
+            data.addColumn('number', "Booking");
+            data.addColumn('number', "Cancel");
+            data.addColumn('number', "Search");
+
+            var rows = [];
+
+            for (var item in returnData) {
+                for (var prop in returnData[item]) {
+                    if (returnData[item][prop] == null) returnData[item][prop] = 0;
+                }
+                rows.push([
+                    new Date(returnData[item].OutDate),
+                    returnData[item].book_count,
+                    returnData[item].cancel_count,
+                    returnData[item].search_count
+                ]);
+            }
+
+            data.addRows(rows);
+
+            var chartOptions = {
+                chart: {
+                    title: 'Bookings, Cancellations and Searches by Out Date'
+                },
+                width: '100%',
+                height: 600,
+                axes: {
+                    // Adds labels to each axis; they don't have to match the axis names.
+                    y: {
+                        Amount: {label: 'Amount'}
+                    }
+                },
+                colors: ['#007034', '#BC1200', '#1078A3']
+            };
+
+            var chart = new google.charts.Line(outChart);
+            chart.draw(data, chartOptions);
+        }
+    });
+}
+
+function customersByBooking() {
+    $.ajax({
+        type: 'POST',
+        url: './overview/customersByBooking', //Same URL is associated on the server
+        contentType: 'application/json',
+        success: function (data) {
+
+            var bookingData;
+            var rateData;
+
+            var bookingOptions = {
+                title: 'Top Bookings By Customers',
+                titleTextStyle: {
+                    fontSize: '20'
+                },
+                colors: ['#1078A3'],
+                chartArea: {
+                    top: '50',
+                    left: 220,
+                    width: '70%',
+                    height: '50%'
+                },
+                legend: {
+                    position: 'none'
+                },
+                hAxis: {
+                    title: 'Total'
+                }
+            };
+
+            var rateOptions = {
+                title: 'Top Bookings By Customers',
+                titleTextStyle: {
+                    fontSize: '20'
+                },
+                colors: ['#1078A3'],
+                chartArea: {
+                    top: '50',
+                    left: 220,
+                    width: '70%',
+                    height: '50%'
+                },
+                legend: {
+                    position: 'none'
+                },
+                hAxis: {
+                    title: 'Total'
+                }
+            };
+
+            var booking = [['Customer', 'Reservations Booked']];
+            var rate = [['Customer', 'Average Rate']];
+
+
+            for(var item in data)
+            {
+                booking.push([data[item].name, data[item].Bookings]);
+                rate.push([data[item].name, data[item].Average]);
+            }
+
+            bookingData = google.visualization.arrayToDataTable(booking);
+            rateData = google.visualization.arrayToDataTable(rate);
+
+            var chart = new google.visualization.BarChart(document.getElementById('chart_customers'));
+            chart.draw(bookingData, bookingOptions);
+
+            chart = new google.visualization.BarChart(document.getElementById('chart_rate'));
+            chart.draw(rateData, rateOptions);
+        }
+    });
+}
+
+function customersByBookingRate() {
+    $.ajax({
+        type: 'POST',
+        url: './overview/customersByBooking', //Same URL is associated on the server
+        contentType: 'application/json',
+        success: function (data) {
+
+            var bookingData;
+
+            var bookingOptions = {
+                title: 'Lowest Average Booking Rate By Customers',
+                titleTextStyle: {
+                    fontSize: '20'
+                },
+                colors: ['#1078A3'],
+                chartArea: {
+                    top: '50',
+                    left: 220,
+                    width: '70%',
+                    height: '50%'
+                },
+                legend: {
+                    position: 'none'
+                },
+                hAxis: {
+                    title: 'Total'
+                }
+            };
+
+            var booking = [['Customer', 'Average Rate']];
+
+
+            for(var item in data)
+            {
+                booking.push([data[item].name, data[item].Average]);
+            }
+
+            bookingData = google.visualization.arrayToDataTable(booking);
+
+            var chart = new google.visualization.BarChart(document.getElementById('chart_rate'));
+            chart.draw(bookingData, bookingOptions);
         }
     });
 }

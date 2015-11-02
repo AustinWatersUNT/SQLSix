@@ -1,7 +1,7 @@
 var connectionCredentials = {
     host: 'localhost',
     user: 'root',
-    password: '2011nman',
+    password: '',
     database: 'sql6'
 };
 

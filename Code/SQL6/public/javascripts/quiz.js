@@ -280,12 +280,14 @@ $(document).ready(function () {
                 //removes all table values
                 propertiesTable.clear();
 
+                console.log(data);
+
                 //Adds all the rows to the table
                 for (var item in data) {
                     propertiesTable.row.add({
-                        0: data[item].name,
-                        1: data[item].city,
-                        2: data[item].state,
+                        0: data[item].Name,
+                        1: data[item].City,
+                        2: data[item].State,
                         3: '$' + data[item].avgrate.toFixed(2)
                     });
                 }
